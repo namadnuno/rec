@@ -1,0 +1,7 @@
+@import "@rec/design-system/css";
+
+/*
+  App-level overrides go below.
+  The design system @theme tokens are available here as CSS vars
+  and as Tailwind utility classes (bg-bg-1, text-fg-0, etc.)
+*/
