@@ -1,0 +1,221 @@
+/*
+ * rec — Design System
+ * Tailwind v4 CSS-first configuration
+ *
+ * Import this file in each app's entry CSS:
+ *   @import "@rec/design-system/css";
+ *
+ * Tailwind v4 maps @theme variables to utility classes:
+ *   --color-*       → bg-*, text-*, border-*, etc.
+ *   --font-family-* → font-*
+ *   --font-size-*   → text-*
+ *   --radius-*      → rounded-*
+ *   --shadow-*      → shadow-*
+ *   --spacing-*     → p-*, m-*, gap-*, w-*, h-*, etc.
+ */
+
+@import "tailwindcss";
+
+/* ─── Google Fonts ──────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* ─── Design Tokens ─────────────────────────────────────── */
+@theme {
+  /* Surfaces — dark (default) */
+  --color-bg-0:  #0a0a0a;
+  --color-bg-1:  #111111;
+  --color-bg-2:  #1c1c1c;
+  --color-bg-3:  #262626;
+  --color-bg-4:  #2e2e2e;
+
+  /* Borders */
+  --color-border:        #242424;
+  --color-border-strong: #383838;
+
+  /* Foreground */
+  --color-fg-0: #f2f2f2;
+  --color-fg-1: #a0a0a0;
+  --color-fg-2: #5c5c5c;
+  --color-fg-3: #333333;
+
+  /* Teal — primary actions */
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-900: #0d2e2b;
+  --color-teal-glow: rgba(45, 212, 191, 0.12);
+
+  /* Red — recording state */
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-900: #2d1515;
+  --color-red-glow: rgba(239, 68, 68, 0.18);
+
+  /* Green — success / upload done */
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-900: #0f2d1a;
+
+  /* Yellow — warning */
+  --color-yellow-400: #facc15;
+  --color-yellow-900: #2d2700;
+
+  /* Semantic aliases (these become utilities too) */
+  --color-primary:        var(--color-teal-400);
+  --color-primary-hover:  var(--color-teal-500);
+  --color-record:         var(--color-red-500);
+  --color-record-hover:   var(--color-red-600);
+  --color-success:        var(--color-green-500);
+  --color-warning:        var(--color-yellow-400);
+  --color-error:          var(--color-red-500);
+
+  /* Typography */
+  --font-family-sans: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Font sizes */
+  --font-size-xs:   11px;
+  --font-size-sm:   12px;
+  --font-size-base: 14px;
+  --font-size-md:   16px;
+  --font-size-lg:   18px;
+  --font-size-xl:   22px;
+  --font-size-2xl:  28px;
+  --font-size-3xl:  36px;
+  --font-size-timer: 48px;
+
+  /* Font weights */
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Spacing (4px base) */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  20px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* Border radius */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:           0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg:           0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-tray:         0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-record-glow:  0 0 12px rgba(239, 68, 68, 0.18);
+  --shadow-primary-glow: 0 0 12px rgba(45, 212, 191, 0.12);
+
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 250ms ease;
+}
+
+/* ─── Light theme overrides ─────────────────────────────── */
+[data-theme="light"] {
+  --color-bg-0:          #f5f5f5;
+  --color-bg-1:          #ffffff;
+  --color-bg-2:          #f8f8f8;
+  --color-bg-3:          #f0f0f0;
+  --color-bg-4:          #e8e8e8;
+  --color-border:        #e5e5e5;
+  --color-border-strong: #d4d4d4;
+  --color-fg-0:          #111111;
+  --color-fg-1:          #555555;
+  --color-fg-2:          #999999;
+  --color-fg-3:          #cccccc;
+}
+
+/* ─── Base styles ───────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-base);
+    color: var(--color-fg-0);
+    background-color: var(--color-bg-1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-bg-4); border-radius: var(--radius-full); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-border-strong); }
+}
+
+/* ─── Custom utilities ──────────────────────────────────── */
+@layer utilities {
+  /* Recording pulse animation */
+  .animate-record-pulse {
+    animation: record-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes record-pulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+  }
+
+  /* Fade-in entrance */
+  .animate-fadein {
+    animation: fadein 200ms ease forwards;
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Monospaced timer text */
+  .text-timer {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-timer);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .text-timer-sm {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.02em;
+  }
+
+  /* Caps label */
+  .text-caps {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-fg-2);
+  }
+
+  /* Frameless window drag region (Electron) */
+  .drag-region {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+
+  .no-drag {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+}
