@@ -1,5 +1,8 @@
 @import "@rec/design-system/css";
 
+/* Tell Tailwind v4 to scan workspace package source (excluded from node_modules scan by default) */
+@source "../../../../../packages/design-system/src";
+
 /*
   App-level overrides go below.
   The design system @theme tokens are available here as CSS vars
