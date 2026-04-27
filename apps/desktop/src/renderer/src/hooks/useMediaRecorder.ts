@@ -30,12 +30,15 @@ export function useMediaRecorder({ onStopped }: UseMediaRecorderOptions): UseMed
   onStoppedRef.current = onStopped
 
   const start = useCallback(async (options: RecordingOptions) => {
+    console.log('[rec] start:', options.source.id, options.source.label, { audio: options.audioEnabled })
     try {
       setError(null)
       chunksRef.current = []
 
       const stream = await acquireStream(options)
       streamRef.current = stream
+      const tracks = stream.getTracks().map((t) => `${t.kind}:${t.label}`)
+      console.log('[rec] stream acquired:', tracks)
 
       const recorder = new MediaRecorder(stream, {
         mimeType: MIME_TYPE,
@@ -50,6 +53,7 @@ export function useMediaRecorder({ onStopped }: UseMediaRecorderOptions): UseMed
         streamRef.current?.getTracks().forEach((t) => t.stop())
         streamRef.current = null
         const blob = new Blob(chunksRef.current, { type: 'video/webm' })
+        console.log(`[rec] onstop: ${chunksRef.current.length} chunks, blob ${(blob.size / 1_048_576).toFixed(2)} MB`)
         const buffer = await blob.arrayBuffer()
         setState('idle')
         onStoppedRef.current(buffer)
@@ -58,8 +62,11 @@ export function useMediaRecorder({ onStopped }: UseMediaRecorderOptions): UseMed
       recorder.start(1000)
       recorderRef.current = recorder
       setState('recording')
+      console.log('[rec] recording started')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start recording')
+      const msg = err instanceof Error ? err.message : 'Failed to start recording'
+      console.error('[rec] start failed:', err)
+      setError(msg)
       setState('idle')
     }
   }, [])
@@ -71,6 +78,7 @@ export function useMediaRecorder({ onStopped }: UseMediaRecorderOptions): UseMed
     })
     recorderRef.current.pause()
     setState('paused')
+    console.log('[rec] paused')
   }, [])
 
   const resume = useCallback(() => {
@@ -80,11 +88,13 @@ export function useMediaRecorder({ onStopped }: UseMediaRecorderOptions): UseMed
     })
     recorderRef.current.resume()
     setState('recording')
+    console.log('[rec] resumed')
   }, [])
 
   const stop = useCallback(() => {
     if (!recorderRef.current || recorderRef.current.state === 'inactive') return
     setState('stopping')
+    console.log('[rec] stopping…')
     recorderRef.current.stop()
   }, [])
 
