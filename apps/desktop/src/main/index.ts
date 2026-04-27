@@ -1,51 +1,69 @@
-import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, shell } from "electron";
-import { join } from "path";
+import { join } from 'node:path'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, shell } from 'electron'
+import { registerRecordingHandlers } from './ipc/recording'
+import { registerShellHandlers } from './ipc/shell'
+import { registerUploadHandlers } from './ipc/upload'
+import { createTray } from './tray'
 
-function createWindow(): void {
-	const mainWindow = new BrowserWindow({
-		width: 900,
-		height: 670,
-		show: false,
-		autoHideMenuBar: true,
-		webPreferences: {
-			preload: join(__dirname, "../preload/index.js"),
-			sandbox: false,
-		},
-	});
+// Wayland support — must be set before app.whenReady()
+app.commandLine.appendSwitch('enable-features', 'WebRTCPipeWireCapturer')
+if (process.env.WAYLAND_DISPLAY || process.env.XDG_SESSION_TYPE === 'wayland') {
+  app.commandLine.appendSwitch('ozone-platform', 'wayland')
+}
 
-	mainWindow.on("ready-to-show", () => {
-		mainWindow.show();
-	});
 
-	mainWindow.webContents.setWindowOpenHandler((details) => {
-		shell.openExternal(details.url);
-		return { action: "deny" };
-	});
+function createWindow(): BrowserWindow {
+  const mainWindow = new BrowserWindow({
+    width: 900,
+    height: 670,
+    show: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false,
+    },
+  })
 
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-		mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
-	} else {
-		mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
-	}
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+  })
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+    return { action: 'deny' }
+  })
+
+  if (is.dev && process.env.ELECTRON_RENDERER_URL) {
+    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
+  } else {
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+
+  return mainWindow
 }
 
 app.whenReady().then(() => {
-	electronApp.setAppUserModelId("com.electron.desktop");
+  electronApp.setAppUserModelId('com.rec.desktop')
 
-	app.on("browser-window-created", (_, window) => {
-		optimizer.watchWindowShortcuts(window);
-	});
+  registerRecordingHandlers()
+  registerShellHandlers()
+  registerUploadHandlers()
 
-	createWindow();
+  app.on('browser-window-created', (_, window) => {
+    optimizer.watchWindowShortcuts(window)
+  })
 
-	app.on("activate", () => {
-		if (BrowserWindow.getAllWindows().length === 0) createWindow();
-	});
-});
+  const mainWindow = createWindow()
+  createTray(mainWindow)
 
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") {
-		app.quit();
-	}
-});
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
